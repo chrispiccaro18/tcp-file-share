@@ -7,9 +7,11 @@ const db = [];
 const server = tcp.createServer(client => {
   console.log('client connected');
   client.on('data', chunk => {
-    db.push(JSON.parse(chunk.toString()));
+    const newFiles = JSON.parse(chunk.toString());
+    db.push(newFiles);
     client.write(JSON.stringify(db));
-    // console.log(JSON.parse(chunk.toString()));
+
+    console.log(newFiles);
   });
 });
 
