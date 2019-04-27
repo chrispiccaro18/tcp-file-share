@@ -1,15 +1,20 @@
 const tcp = require('net');
+const ChatRoom = require('./ChatRoom');
 
 const PORT = process.env.PORT || 7890;
 
 const db = [];
+const chatRoom = new ChatRoom();
 
 const server = tcp.createServer(client => {
-  console.log('client connected');
+  chatRoom.add(client);
+  console.log(`${client.username} has joined`);
   client.on('data', chunk => {
     const newFiles = JSON.parse(chunk.toString());
-    db.push(newFiles);
-    client.write(JSON.stringify(db));
+    db.push({ nick: client.username, ...newFiles });
+    chatRoom.clients.forEach(client => {
+      client.write(JSON.stringify(db));
+    });
 
     console.log(newFiles);
   });
