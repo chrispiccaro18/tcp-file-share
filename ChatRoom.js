@@ -27,6 +27,10 @@ class ChatRoom {
   all() {
     return [...this.clients.values()];
   }
+
+  delete(username) {
+    return this.clients.delete(username);
+  }
 }
 
 module.exports = ChatRoom;

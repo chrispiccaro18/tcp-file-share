@@ -15,8 +15,21 @@ const server = tcp.createServer(client => {
     chatRoom.clients.forEach(client => {
       client.write(JSON.stringify(db));
     });
-
     console.log(newFiles);
+
+    client.on('close', () => {
+      chatRoom.delete(client.username);
+      for(let i = 0; i < db.length; i++){ 
+        if(db[i].nick === client.username) {
+          db.splice(i, 1);
+          break;
+        }
+      }
+      chatRoom.clients.forEach(client => {
+        client.write(JSON.stringify(`${client.username} has left`));
+        client.write(JSON.stringify(db));
+      });
+    });
   });
 });
 
