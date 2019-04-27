@@ -34,13 +34,13 @@ const connectionToServer = net.createConnection(7890, () => {
     if(err) {
       return console.log(`Error: ${err}`);
     }
-    const payload = { ip, files };
+    const payload = { code: 1, ip, files };
     connectionToServer.write(JSON.stringify(payload));
   });
 
   rl.prompt();
   rl.on('line', line => {
-    connectionToServer.write(line);
+    connectionToServer.write(JSON.stringify({ code: 2, line }));
     rl.prompt();
   });
 });

@@ -1,34 +1,31 @@
 const tcp = require('net');
-const ChatRoom = require('./ChatRoom');
+const parseMessage = require('./parse-message');
+const db = require('./db');
+const chatRoom = require('./chat-room');
 
 const PORT = process.env.PORT || 7890;
-
-const db = [];
-const chatRoom = new ChatRoom();
 
 const server = tcp.createServer(client => {
   chatRoom.add(client);
   console.log(`${client.username} has joined`);
-  client.on('data', chunk => {
-    const newFiles = JSON.parse(chunk.toString());
-    db.push({ nick: client.username, ...newFiles });
-    chatRoom.clients.forEach(client => {
-      client.write(JSON.stringify(db));
-    });
-    console.log(newFiles);
 
-    client.on('close', () => {
-      chatRoom.delete(client.username);
-      for(let i = 0; i < db.length; i++){ 
-        if(db[i].nick === client.username) {
-          db.splice(i, 1);
-          break;
-        }
-      }
-      chatRoom.clients.forEach(client => {
-        client.write(JSON.stringify(`${client.username} has left`));
-        client.write(JSON.stringify(db));
-      });
+  client.on('data', chunk => {
+    const parsed = parseMessage(chunk.toString(), client);
+
+    console.log(parsed);
+    if(parsed.file) {
+      const { ip } = parsed;
+      client.write(JSON.stringify({ code: 3, ip }));
+    }
+
+  });
+
+  client.on('close', () => {
+    chatRoom.delete(client.username);
+    deleteFromDb(client);
+    chatRoom.clients.forEach(client => {
+      client.write(JSON.stringify(`${client.username} has left`));
+      client.write(JSON.stringify(db));
     });
   });
 });
@@ -36,3 +33,12 @@ const server = tcp.createServer(client => {
 server.listen(PORT, () => {
   console.log('listening on 7890');
 });
+
+const deleteFromDb = function(client) {
+  for(let i = 0; i < db.length; i++){ 
+    if(db[i].nick === client.username) {
+      db.splice(i, 1);
+      break;
+    }
+  }
+};
