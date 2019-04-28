@@ -31,7 +31,22 @@ const connectionToServer = net.createConnection(7890, () => {
 });
 
 
-connectionToServer.on('data', data => {
-  console.log(JSON.parse(data.toString()));
+connectionToServer.on('data', chunk => {
+  const parsed = JSON.parse(chunk.toString());
+  // const parsed = parseMessage(chunk.toString());
+  console.log(parsed);
+  if(parsed.code === 3) {
+    setTimeout(() => {
+      const downloadClient = net.createConnection(8080, () => {
+        console.log('I am connected to 8080');
+        const copy = fs.createWriteStream(`/Users/chrispiccaro/clone2/${parsed.file}`);
+        downloadClient.on('data', chunk => {
+          copy.write(chunk, err => {
+            if(err) console.log(err);
+          });
+        });
+      });
+    }, 2000);
+  }
   rl.prompt();
 });

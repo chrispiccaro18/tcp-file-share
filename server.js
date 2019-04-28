@@ -13,13 +13,13 @@ const server = tcp.createServer(client => {
     const parsed = parseMessage(chunk.toString(), client);
 
     console.log(parsed);
-    if(parsed.file) {
+    if(parsed.exists) {
       const { ip } = parsed;
       // this client wants to download
-      client.write(JSON.stringify({ code: 3, ip }));
+      client.write(JSON.stringify({ code: 3, ip, file: parsed.file }));
       // this client has what above client wants to download
       const receiver = chatRoom.getClient(parsed.nick);
-      receiver.write(JSON.stringify({ code: 4, client: client.username, ip: client.address().address }));
+      receiver.write(JSON.stringify({ code: 4, file: parsed.file, client: client.username, ip: client.address().address }));
     }
 
   });
