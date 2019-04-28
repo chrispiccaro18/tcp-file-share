@@ -2,22 +2,6 @@ const net = require('net');
 const fs = require('fs');
 const readline = require('readline');
 
-// const options = {
-//   encoding: 'utf8', 
-//   highWaterMark: 16 * 1024 
-// };
-// const readClone = fs.createReadStream('/Users/chrispiccaro/clone/hello.txt', options);
-// readClone.on('data', chunk => {
-//   console.log(chunk);
-// });
-
-// fs.readdir('/Users/chrispiccaro/clone', (err, files) => {
-//   if(err) {
-//     return console.log(`Error: ${err}`);
-//   }
-//   console.log(files);
-// });
-
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
